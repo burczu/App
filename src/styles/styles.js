@@ -2917,6 +2917,10 @@ const styles = {
         fontSize: variables.fontSizeXXLarge,
         letterSpacing: 4,
     },
+
+    illustratedPageHeader: {
+        height: 220,
+    },
 };
 
 export default styles;
