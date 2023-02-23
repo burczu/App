@@ -11,6 +11,9 @@ const propTypes = {
     /** Subtitle of the header */
     subtitle: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
 
+    /** Background color to apply in the header */
+    backgroundColor: PropTypes.string,
+
     /** Method to trigger when pressing download button of the header */
     onDownloadButtonPress: PropTypes.func,
 
@@ -72,6 +75,7 @@ const propTypes = {
 const defaultProps = {
     title: '',
     subtitle: '',
+    backgroundColor: '',
     onDownloadButtonPress: () => {},
     onCloseButtonPress: () => {},
     onBackButtonPress: () => {},
