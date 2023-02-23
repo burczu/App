@@ -1,4 +1,6 @@
 import PropTypes from 'prop-types';
+import {withNavigationPropTypes} from '../withNavigation';
+import {windowDimensionsPropTypes} from '../withWindowDimensions';
 
 const propTypes = {
     /** Array of additional styles to add */
@@ -28,6 +30,9 @@ const propTypes = {
         /** Indicates when an Alert modal is about to be visible */
         willAlertModalBecomeVisible: PropTypes.bool,
     }),
+
+    ...withNavigationPropTypes,
+    ...windowDimensionsPropTypes,
 };
 
 const defaultProps = {

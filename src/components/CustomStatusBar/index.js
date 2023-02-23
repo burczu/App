@@ -6,6 +6,7 @@ import themeColors from '../../styles/themes/default';
 class CustomStatusBar extends Component {
     componentDidMount() {
         StatusBar.setBarStyle('light-content', true);
+        console.log('RORY_DEBUG setting global custom status bar color');
         setBackgroundColor(themeColors.appBG);
     }
 

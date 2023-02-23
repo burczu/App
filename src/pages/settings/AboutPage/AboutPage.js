@@ -19,6 +19,7 @@ import * as Report from '../../../libs/actions/Report';
 import * as Link from '../../../libs/actions/Link';
 import getPlatformSpecificMenuItems from './getPlatformSpecificMenuItems';
 import compose from '../../../libs/compose';
+import IllustratedHeaderPageLayout from '../../../components/IllustratedHeaderPageLayout';
 
 const propTypes = {
     ...withLocalizePropTypes,
@@ -61,87 +62,75 @@ const AboutPage = (props) => {
     ];
 
     return (
-        <ScreenWrapper includeSafeAreaPaddingBottom={false}>
-            {({safeAreaPaddingBottomStyle}) => (
-                <>
-                    <HeaderWithCloseButton
-                        title={props.translate('initialSettingsPage.about')}
-                        shouldShowBackButton
-                        onBackButtonPress={() => Navigation.navigate(ROUTES.SETTINGS)}
-                        onCloseButtonPress={() => Navigation.dismissModal(true)}
+        <IllustratedHeaderPageLayout
+            title={props.translate('initialSettingsPage.about')}
+            illustration={() => <Logo height={80} width={80} />}
+            backgroundColor="#401102"
+            shouldShowBackButton
+            onBackButtonPress={() => Navigation.navigate(ROUTES.SETTINGS)}
+            onCloseButtonPress={() => Navigation.dismissModal(true)}
+        >
+            <View style={[styles.flex1]}>
+                {/*<View style={styles.pageWrapper}>*/}
+                {/*    <View style={[styles.settingsPageBody, styles.mb6, styles.alignItemsCenter]}>*/}
+                {/*        <Logo height={80} width={80} />*/}
+                {/*        <Text*/}
+                {/*            selectable*/}
+                {/*            style={[*/}
+                {/*                styles.textLabel,*/}
+                {/*                styles.alignSelfCenter,*/}
+                {/*                styles.mt6,*/}
+                {/*                styles.mb2,*/}
+                {/*                styles.colorMuted,*/}
+                {/*            ]}*/}
+                {/*        >*/}
+                {/*            v*/}
+                {/*            {pkg.version}*/}
+                {/*        </Text>*/}
+                {/*        <Text style={[styles.baseFontStyle, styles.mv5]}>*/}
+                {/*            {props.translate('initialSettingsPage.aboutPage.description')}*/}
+                {/*        </Text>*/}
+                {/*    </View>*/}
+                {/*</View>*/}
+                {_.map(menuItems, item => (
+                    <MenuItem
+                        key={item.translationKey}
+                        title={props.translate(item.translationKey)}
+                        icon={item.icon}
+                        iconRight={item.iconRight}
+                        onPress={() => item.action()}
+                        shouldShowRightIcon
                     />
-                    <ScrollView
-                        contentContainerStyle={[
-                            styles.flexGrow1,
-                            styles.flexColumn,
-                            styles.justifyContentBetween,
-                            safeAreaPaddingBottomStyle,
-                        ]}
-                    >
-                        <View style={[styles.flex1]}>
-                            <View style={styles.pageWrapper}>
-                                <View style={[styles.settingsPageBody, styles.mb6, styles.alignItemsCenter]}>
-                                    <Logo height={80} width={80} />
-                                    <Text
-                                        selectable
-                                        style={[
-                                            styles.textLabel,
-                                            styles.alignSelfCenter,
-                                            styles.mt6,
-                                            styles.mb2,
-                                            styles.colorMuted,
-                                        ]}
-                                    >
-                                        v
-                                        {pkg.version}
-                                    </Text>
-                                    <Text style={[styles.baseFontStyle, styles.mv5]}>
-                                        {props.translate('initialSettingsPage.aboutPage.description')}
-                                    </Text>
-                                </View>
-                            </View>
-                            {_.map(menuItems, item => (
-                                <MenuItem
-                                    key={item.translationKey}
-                                    title={props.translate(item.translationKey)}
-                                    icon={item.icon}
-                                    iconRight={item.iconRight}
-                                    onPress={() => item.action()}
-                                    shouldShowRightIcon
-                                />
-                            ))}
-                        </View>
-                        <View style={[styles.sidebarFooter]}>
-                            <Text
-                                style={[styles.chatItemMessageHeaderTimestamp]}
-                                numberOfLines={1}
-                            >
-                                {props.translate(
-                                    'initialSettingsPage.readTheTermsAndPrivacy.phrase1',
-                                )}
-                                {' '}
-                                <TextLink style={[styles.textMicroSupporting, styles.link]} href={CONST.TERMS_URL}>
-                                    {props.translate(
-                                        'initialSettingsPage.readTheTermsAndPrivacy.phrase2',
-                                    )}
-                                </TextLink>
-                                {' '}
-                                {props.translate(
-                                    'initialSettingsPage.readTheTermsAndPrivacy.phrase3',
-                                )}
-                                {' '}
-                                <TextLink style={[styles.textMicroSupporting, styles.link]} href={CONST.PRIVACY_URL}>
-                                    {props.translate(
-                                        'initialSettingsPage.readTheTermsAndPrivacy.phrase4',
-                                    )}
-                                </TextLink>
-                                .
-                            </Text>
-                        </View>
-                    </ScrollView>
-                </>
-            )}
-        </ScreenWrapper>
+                ))}
+            </View>
+            <View style={[styles.sidebarFooter]}>
+                <Text
+                    style={[styles.chatItemMessageHeaderTimestamp]}
+                    numberOfLines={1}
+                >
+                    {props.translate(
+                        'initialSettingsPage.readTheTermsAndPrivacy.phrase1',
+                    )}
+                    {' '}
+                    <TextLink style={[styles.textMicroSupporting, styles.link]} href={CONST.TERMS_URL}>
+                        {props.translate(
+                            'initialSettingsPage.readTheTermsAndPrivacy.phrase2',
+                        )}
+                    </TextLink>
+                    {' '}
+                    {props.translate(
+                        'initialSettingsPage.readTheTermsAndPrivacy.phrase3',
+                    )}
+                    {' '}
+                    <TextLink style={[styles.textMicroSupporting, styles.link]} href={CONST.PRIVACY_URL}>
+                        {props.translate(
+                            'initialSettingsPage.readTheTermsAndPrivacy.phrase4',
+                        )}
+                    </TextLink>
+                    .
+                </Text>
+            </View>
+        </IllustratedHeaderPageLayout>
     );
 };
 

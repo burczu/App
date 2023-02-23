@@ -1,8 +1,9 @@
-import {View} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import React from 'react';
 import _ from 'underscore';
 import {withOnyx} from 'react-native-onyx';
 import lodashGet from 'lodash/get';
+import {getDrawerStatusFromState} from '@react-navigation/drawer';
 import KeyboardAvoidingView from '../KeyboardAvoidingView';
 import CONST from '../../CONST';
 import KeyboardShortcut from '../../libs/KeyboardShortcut';
@@ -17,6 +18,8 @@ import ONYXKEYS from '../../ONYXKEYS';
 import {withNetwork} from '../OnyxProvider';
 import {propTypes, defaultProps} from './propTypes';
 import SafeAreaConsumer from '../SafeAreaConsumer';
+import setStatusBarBackgroundColor from '../CustomStatusBar/setBackgroundColor';
+import themeColors from '../../styles/themes/default';
 
 class ScreenWrapper extends React.Component {
     constructor(props) {
@@ -39,6 +42,12 @@ class ScreenWrapper extends React.Component {
 
         this.unsubscribeTransitionStart = this.props.navigation.addListener('transitionStart', () => {
             Navigation.setIsNavigating(true);
+
+            const flattenedStyles = StyleSheet.flatten(this.props.style);
+            if (!_.has(flattenedStyles, 'backgroundColor')) {
+                return;
+            }
+            setStatusBarBackgroundColor(flattenedStyles.backgroundColor, true);
         });
 
         this.unsubscribeTransitionEnd = this.props.navigation.addListener('transitionEnd', (event) => {
@@ -51,6 +60,32 @@ class ScreenWrapper extends React.Component {
             this.setState({didScreenTransitionEnd: true});
             this.props.onEntryTransitionEnd();
         });
+
+        this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+            const flattenedStyles = StyleSheet.flatten(this.props.style);
+            if (!_.has(flattenedStyles, 'backgroundColor')) {
+                return;
+            }
+            console.log('RORY_DEBUG setting status bar background color', flattenedStyles.backgroundColor);
+            setStatusBarBackgroundColor(flattenedStyles.backgroundColor, true);
+        });
+
+        // Hack alert – the focus event is not emitted separately for each screen in a drawer navigator
+        // i.e: when the drawer opens and closes both the LHN and the report screen say they are focused
+        // Therefore, we just hard-code in some logic for screens inside a drawer navigator:
+        // - If the sidebar is open, then we set the status bar to match the sidebar color
+        // - If the sidebar is closed, then we set the status bar to match the report screen
+        // const isInDrawerNavigator = _.has(this.props.navigation, 'toggleDrawer');
+        // if (isInDrawerNavigator) {
+        //     this.unsubcribeDrawerStatus = this.props.navigation.addListener('state', () => {
+        //         const isDrawerOpen = getDrawerStatusFromState(this.props.navigation.getState()) === 'open';
+        //         if (isDrawerOpen === this.isDrawerOpen) {
+        //             return;
+        //         }
+        //         this.isDrawerOpen = isDrawerOpen;
+        //         setStatusBarBackgroundColor(isDrawerOpen ? themeColors.sidebar : themeColors.appBG, true);
+        //     });
+        // }
     }
 
     /**
@@ -65,6 +100,15 @@ class ScreenWrapper extends React.Component {
             || !_.isEqual(_.omit(this.props, 'modal'), _.omit(nextProps, 'modal'));
     }
 
+    componentDidUpdate(prevProps) {
+        const prevFlattenedStyles = StyleSheet.flatten(prevProps.style);
+        const flattenedStyles = StyleSheet.flatten(this.props.style);
+        if (flattenedStyles.backgroundColor !== prevFlattenedStyles.backgroundColor) {
+            console.log('RORY_DEBUG setting updated backgroundColor', flattenedStyles.backgroundColor, this.props.navigation);
+            setStatusBarBackgroundColor(flattenedStyles.backgroundColor, true);
+        }
+    }
+
     componentWillUnmount() {
         if (this.unsubscribeEscapeKey) {
             this.unsubscribeEscapeKey();
@@ -74,6 +118,9 @@ class ScreenWrapper extends React.Component {
         }
         if (this.unsubscribeTransitionStart) {
             this.unsubscribeTransitionStart();
+        }
+        if (this.unsubscribeFocus) {
+            this.unsubscribeFocus();
         }
     }
 
