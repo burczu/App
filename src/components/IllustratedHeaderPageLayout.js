@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import React from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {ScrollView, View} from 'react-native';
 import Lottie from 'lottie-react-native';
@@ -9,6 +9,8 @@ import {
 } from './HeaderWithCloseButton/headerWithCloseButtonPropTypes';
 import HeaderWithCloseButton from './HeaderWithCloseButton';
 import ScreenWrapper from './ScreenWrapper';
+import setStatusBarBackgroundColor from './CustomStatusBar/setBackgroundColor';
+import themeColors from '../styles/themes/default';
 import styles from '../styles/styles';
 import * as StyleUtils from '../styles/StyleUtils';
 
@@ -26,35 +28,45 @@ const defaultProps = {
     ...headerWithCloseButtonDefaultProps,
 };
 
-const IllustratedHeaderPageLayout = (props) => {
-    const propsToPassToHeader = _.omit(props, 'illustration');
-    return (
-        <ScreenWrapper includeSafeAreaPaddingBottom={false}>
-            {({safeAreaPaddingBottomStyle}) => (
-                <>
-                    <HeaderWithCloseButton {...propsToPassToHeader} />
-                    <View style={[styles.illustratedPageHeader, StyleUtils.getBackgroundColorStyle(props.backgroundColor)]}>
-                        {_.isFunction(props.illustration)
-                            ? props.illustration()
-                            : <Lottie source={props.illustration} style={{width: 50, height: 50}} autoPlay loop/>
-                        }
-                    </View>
-                    <ScrollView contentContainerStyle={[
-                        styles.flexGrow1,
-                        styles.flexColumn,
-                        styles.justifyContentBetween,
-                        safeAreaPaddingBottomStyle,
-                    ]}>
-                        {props.children}
-                    </ScrollView>
-                </>
-            )}
-        </ScreenWrapper>
-    );
-};
+class IllustratedHeaderPageLayout extends Component {
+    componentDidMount() {
+        setStatusBarBackgroundColor(this.props.backgroundColor, true);
+    }
+
+    componentWillUnmount() {
+        setStatusBarBackgroundColor(themeColors.appBG, true);
+    }
+
+    render() {
+        const propsToPassToHeader = _.omit(this.props, 'illustration');
+        return (
+            <ScreenWrapper includeSafeAreaPaddingBottom={false}>
+                {({safeAreaPaddingBottomStyle}) => (
+                    <>
+                        <HeaderWithCloseButton {...propsToPassToHeader} />
+                        <View
+                            style={[styles.illustratedPageHeader, StyleUtils.getBackgroundColorStyle(this.props.backgroundColor)]}>
+                            {_.isFunction(this.props.illustration)
+                                ? this.props.illustration()
+                                : <Lottie source={props.illustration} style={{width: 50, height: 50}} autoPlay loop/>
+                            }
+                        </View>
+                        <ScrollView contentContainerStyle={[
+                            styles.flexGrow1,
+                            styles.flexColumn,
+                            styles.justifyContentBetween,
+                            safeAreaPaddingBottomStyle,
+                        ]}>
+                            {this.props.children}
+                        </ScrollView>
+                    </>
+                )}
+            </ScreenWrapper>
+        );
+    }
+}
 
 IllustratedHeaderPageLayout.propTypes = propTypes;
 IllustratedHeaderPageLayout.defaultProps = defaultProps;
-IllustratedHeaderPageLayout.displayName = 'IllustratedHeaderPageLayout';
 
 export default IllustratedHeaderPageLayout;
