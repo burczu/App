@@ -14,6 +14,9 @@ import * as Expensicons from './Icon/Expensicons';
 import * as StyleUtils from '../styles/StyleUtils';
 import DotIndicatorMessage from './DotIndicatorMessage';
 import shouldRenderOffscreen from '../libs/shouldRenderOffscreen';
+import colors from "../styles/colors";
+import variables from "../styles/variables";
+import CONST from "../CONST";
 
 /**
  * This component should be used when we are using the offline pattern B (offline with feedback).
@@ -22,6 +25,9 @@ import shouldRenderOffscreen from '../libs/shouldRenderOffscreen';
  */
 
 const propTypes = {
+    /** The name of the action */
+    actionName: PropTypes.string,
+
     /** The type of action that's pending  */
     pendingAction: PropTypes.oneOf(['add', 'update', 'delete']),
 
@@ -31,6 +37,9 @@ const propTypes = {
 
     /** Whether we should show the error messages */
     shouldShowErrorMessages: PropTypes.bool,
+
+    /** Whether we should show only the error indicator (overrides the `shouldShowErrorMessages`) */
+    shouldShowErrorIndicatorOnly: PropTypes.bool,
 
     /** A function to run when the X button next to the error is clicked */
     onClose: PropTypes.func,
@@ -54,9 +63,11 @@ const propTypes = {
 };
 
 const defaultProps = {
+    actionName: null,
     pendingAction: null,
     errors: null,
     shouldShowErrorMessages: true,
+    shouldShowErrorIndicatorOnly: false,
     onClose: () => {},
     style: [],
     contentContainerStyle: [],
@@ -86,7 +97,8 @@ const OfflineWithFeedback = (props) => {
     const isOfflinePendingAction = props.network.isOffline && props.pendingAction;
     const isUpdateOrDeleteError = hasErrors && (props.pendingAction === 'delete' || props.pendingAction === 'update');
     const isAddError = hasErrors && props.pendingAction === 'add';
-    const needsOpacity = (isOfflinePendingAction && !isUpdateOrDeleteError) || isAddError;
+    const isIOUError = props.actionName === CONST.REPORT.ACTIONS.TYPE.IOU && !!props.errors;
+    const needsOpacity = (isOfflinePendingAction && !isUpdateOrDeleteError) || isAddError || isIOUError;
     const needsStrikeThrough = props.network.isOffline && props.pendingAction === 'delete';
     const hideChildren = !props.network.isOffline && props.pendingAction === 'delete' && !hasErrors;
     let children = props.children;
@@ -96,32 +108,39 @@ const OfflineWithFeedback = (props) => {
         children = applyStrikeThrough(children);
     }
     return (
-        <View style={props.style}>
-            {!hideChildren && (
-                <View
-                    style={[needsOpacity ? styles.offlineFeedback.pending : {}, props.contentContainerStyle]}
-                    needsOffscreenAlphaCompositing={
-                        shouldRenderOffscreen
-                            ? (needsOpacity && props.needsOffscreenAlphaCompositing)
-                            : undefined
-                    }
-                >
-                    {children}
-                </View>
-            )}
-            {(props.shouldShowErrorMessages && hasErrors) && (
-                <View style={StyleUtils.combineStyles(styles.offlineFeedback.error, props.errorRowStyles)}>
-                    <DotIndicatorMessage style={[styles.flex1]} messages={props.errors} type="error" />
-                    <Tooltip text={props.translate('common.close')}>
-                        <Pressable
-                            onPress={props.onClose}
-                            style={[styles.touchableButtonImage]}
-                            accessibilityRole="button"
-                            accessibilityLabel={props.translate('common.close')}
-                        >
-                            <Icon src={Expensicons.Close} />
-                        </Pressable>
-                    </Tooltip>
+        <View>
+            <View style={props.style}>
+                {!hideChildren && (
+                    <View
+                        style={[needsOpacity ? styles.offlineFeedback.pending : {}, props.contentContainerStyle]}
+                        needsOffscreenAlphaCompositing={
+                            shouldRenderOffscreen
+                                ? (needsOpacity && props.needsOffscreenAlphaCompositing)
+                                : undefined
+                        }
+                    >
+                        {children}
+                    </View>
+                )}
+                {(!props.shouldShowErrorIndicatorOnly && props.shouldShowErrorMessages && hasErrors) && (
+                    <View style={StyleUtils.combineStyles(styles.offlineFeedback.error, props.errorRowStyles)}>
+                        <DotIndicatorMessage style={[styles.flex1]} messages={props.errors} type="error" />
+                        <Tooltip text={props.translate('common.close')}>
+                            <Pressable
+                                onPress={props.onClose}
+                                style={[styles.touchableButtonImage]}
+                                accessibilityRole="button"
+                                accessibilityLabel={props.translate('common.close')}
+                            >
+                                <Icon src={Expensicons.Close} />
+                            </Pressable>
+                        </Tooltip>
+                    </View>
+                )}
+            </View>
+            {props.shouldShowErrorIndicatorOnly && hasErrors && (
+                <View style={{position: 'absolute', top: 30, right: 40}}>
+                    <Icon src={Expensicons.DotIndicator} fill={colors.red} height={variables.iconSizeSmall} width={variables.iconSizeSmall} />
                 </View>
             )}
         </View>

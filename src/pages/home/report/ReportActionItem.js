@@ -264,6 +264,7 @@ class ReportActionItem extends Component {
                                 )}
                             >
                                 <OfflineWithFeedback
+                                    actionName={this.props.action.actionName}
                                     onClose={() => {
                                         if (this.props.action.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
                                             ReportActions.deleteOptimisticReportAction(this.props.report.reportID, this.props.action.reportActionID);
@@ -275,6 +276,7 @@ class ReportActionItem extends Component {
                                     errors={this.props.action.errors}
                                     errorRowStyles={[styles.ml10, styles.mr2]}
                                     needsOffscreenAlphaCompositing={this.props.action.actionName === CONST.REPORT.ACTIONS.TYPE.IOU}
+                                    shouldShowErrorIndicatorOnly
                                 >
                                     {!this.props.displayAsGroup
                                         ? (

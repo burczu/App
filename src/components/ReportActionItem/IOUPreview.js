@@ -28,6 +28,7 @@ import reportActionPropTypes from '../../pages/home/report/reportActionPropTypes
 import {showContextMenuForReport} from '../ShowContextMenuContext';
 import * as ReportUtils from '../../libs/ReportUtils';
 import Button from '../Button';
+import * as ReportActions from "../../libs/actions/ReportActions";
 
 const propTypes = {
     /** Additional logic for displaying the pay button */
@@ -133,13 +134,23 @@ const IOUPreview = (props) => {
     // until it is stored locally, we need to make this check within the Component after retrieving it. This allows us
     // to handle the loading UI from within this Component instead of needing to declare it within each parent, which
     // would duplicate and complicate the logic
-    if (props.iouReport.total === 0) {
+    if (props.iouReport.total === 0 && !(props.action || {}).errors) {
         return null;
     }
 
     const sessionEmail = lodashGet(props.session, 'email', null);
     const managerEmail = props.iouReport.managerEmail || '';
     const ownerEmail = props.iouReport.ownerEmail || '';
+
+    let total = props.iouReport.total;
+    let hasOutstandingIOU = props.iouReport.hasOutstandingIOU;
+    let stateNum = props.iouReport.stateNum;
+
+    if (props.action && !_.isEmpty(props.action.errors) && props.action.originalMessage.type === CONST.IOU.REPORT_ACTION_TYPE.PAY) {
+        total = props.action.originalMessage.IOUDetails.amount;
+        hasOutstandingIOU = false;
+        stateNum = CONST.REPORT.STATE_NUM.SUBMITTED;
+    }
 
     // Pay button should only be visible to the manager of the report.
     const isCurrentUserManager = managerEmail === sessionEmail;
@@ -156,11 +167,12 @@ const IOUPreview = (props) => {
         type: CONST.ICON_TYPE_AVATAR,
         name: ownerEmail,
     };
-    const cachedTotal = props.iouReport.total && props.iouReport.currency
+    const cachedTotal = total && props.iouReport.currency
         ? props.numberFormat(
-            Math.abs(props.iouReport.total) / 100,
+            Math.abs(total) / 100,
             {style: 'currency', currency: props.iouReport.currency},
         ) : '';
+
     const avatarTooltip = [Str.removeSMSDomain(managerEmail), Str.removeSMSDomain(ownerEmail)];
 
     const showContextMenu = (event) => {
@@ -203,7 +215,7 @@ const IOUPreview = (props) => {
                                 <Text style={styles.h1}>
                                     {cachedTotal}
                                 </Text>
-                                {!props.iouReport.hasOutstandingIOU && (
+                                {!hasOutstandingIOU && (
                                     <View style={styles.iouPreviewBoxCheckmark}>
                                         <Icon src={Expensicons.Checkmark} fill={themeColors.iconSuccessFill} />
                                     </View>
@@ -225,7 +237,7 @@ const IOUPreview = (props) => {
                         {isCurrentUserManager
                             ? (
                                 <Text>
-                                    {props.iouReport.hasOutstandingIOU
+                                    {hasOutstandingIOU
                                         ? props.translate('iou.youowe', {owner: ownerName})
                                         : props.translate('iou.youpaid', {owner: ownerName})}
                                 </Text>
@@ -233,7 +245,7 @@ const IOUPreview = (props) => {
                             : (
                                 <>
                                     <Text>
-                                        {props.iouReport.hasOutstandingIOU
+                                        {hasOutstandingIOU
                                             ? props.translate('iou.owesyou', {manager: managerName})
                                             : props.translate('iou.paidyou', {manager: managerName})}
                                     </Text>
@@ -246,7 +258,8 @@ const IOUPreview = (props) => {
                             )}
                         {(isCurrentUserManager
                             && !props.shouldHidePayButton
-                            && props.iouReport.stateNum === CONST.REPORT.STATE_NUM.PROCESSING && (
+                            && stateNum === CONST.REPORT.STATE_NUM.PROCESSING
+                            && (
                                 <Button
                                     style={styles.mt4}
                                     onPress={props.onPayButtonPressed}
@@ -257,7 +270,7 @@ const IOUPreview = (props) => {
                                     success
                                     medium
                                 />
-                        ))}
+                            ))}
                     </View>
                 </OfflineWithFeedback>
             </View>
