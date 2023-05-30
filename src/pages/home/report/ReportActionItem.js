@@ -64,6 +64,7 @@ import * as PersonalDetailsUtils from '../../../libs/PersonalDetailsUtils';
 import ReportActionItemBasicMessage from './ReportActionItemBasicMessage';
 import * as store from '../../../libs/actions/ReimbursementAccount/store';
 import * as BankAccounts from '../../../libs/actions/BankAccounts';
+import FloatingDateIndicator from "./FloatingDateIndicator";
 
 const propTypes = {
     ...windowDimensionsPropTypes,
@@ -105,6 +106,12 @@ const propTypes = {
 
     /** Is this the only report action on the report? */
     isOnlyReportAction: PropTypes.bool,
+
+    /** List of betas available to current user */
+    betas: PropTypes.arrayOf(PropTypes.string),
+
+    /** Should we show the date indicator? */
+    showDateIndicator: PropTypes.bool.isRequired,
 };
 
 const defaultProps = {
@@ -511,6 +518,9 @@ function ReportActionItem(props) {
             withoutFocusOnSecondaryInteraction
             accessibilityLabel={props.translate('accessibilityHints.chatMessage')}
         >
+            {props.showDateIndicator && (
+                <FloatingDateIndicator created={props.action.created} />
+            )}
             <Hoverable disabled={Boolean(props.draftMessage)}>
                 {(hovered) => (
                     <View>

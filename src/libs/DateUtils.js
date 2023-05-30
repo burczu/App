@@ -63,35 +63,53 @@ function getLocalMomentFromDatetime(locale, datetime, currentSelectedTimezone = 
  *
  * @param {String} locale
  * @param {String} datetime
- * @param {Boolean} includeTimeZone
  * @param {String} [currentSelectedTimezone]
  * @param {Boolean} isLowercase
  *
  * @returns {String}
  */
-function datetimeToCalendarTime(locale, datetime, includeTimeZone = false, currentSelectedTimezone, isLowercase = false) {
+function datetimeToCalendarTime(locale, datetime, currentSelectedTimezone, isLowercase = false) {
     const date = getLocalMomentFromDatetime(locale, datetime, currentSelectedTimezone);
-    const tz = includeTimeZone ? ' [UTC]Z' : '';
 
-    let todayAt = Localize.translate(locale, 'common.todayAt');
-    let tomorrowAt = Localize.translate(locale, 'common.tomorrowAt');
-    let yesterdayAt = Localize.translate(locale, 'common.yesterdayAt');
-    const at = Localize.translate(locale, 'common.conjunctionAt');
+    let today = Localize.translate(locale, 'common.today');
+    let tomorrow = Localize.translate(locale, 'common.tomorrow');
+    let yesterday = Localize.translate(locale, 'common.yesterday');
 
     if (isLowercase) {
-        todayAt = todayAt.toLowerCase();
-        tomorrowAt = tomorrowAt.toLowerCase();
-        yesterdayAt = yesterdayAt.toLowerCase();
+        today = today.toLowerCase();
+        tomorrow = tomorrow.toLowerCase();
+        yesterday = yesterday.toLowerCase();
     }
 
     return moment(date).calendar({
-        sameDay: `[${todayAt}] LT${tz}`,
-        nextDay: `[${tomorrowAt}] LT${tz}`,
-        lastDay: `[${yesterdayAt}] LT${tz}`,
-        nextWeek: `MMM D [${at}] LT${tz}`,
-        lastWeek: `MMM D [${at}] LT${tz}`,
-        sameElse: `MMM D, YYYY [${at}] LT${tz}`,
+        sameDay: `[${today}]`,
+        nextDay: `[${tomorrow}]`,
+        lastDay: `[${yesterday}]`,
+        nextWeek: `MMM D`,
+        lastWeek: `MMM D`,
+        sameElse: `MMM D, YYYY`,
     });
+}
+
+/**
+ * Formats an ISO-formatted datetime string time string
+ *
+ * e.g.
+ *
+ *  5:30 PM
+ *
+ * @param {String} locale
+ * @param {String} datetime
+ * @param {Boolean} includeTimeZone
+ * @param {String} [currentSelectedTimezone]
+ *
+ * @returns {String}
+ */
+function datetimeToLocalString(locale, datetime, includeTimeZone = false, currentSelectedTimezone) {
+    const date = getLocalMomentFromDatetime(locale, datetime, currentSelectedTimezone);
+    const tz = includeTimeZone ? ' [UTC]Z' : '';
+
+    return moment(date).format(`LT${tz}`);
 }
 
 /**
@@ -206,11 +224,21 @@ function getDateStringFromISOTimestamp(isoTimestamp) {
 }
 
 /**
+ * @param {String} date
+ * @param {String} formatString
+ * @returns {String}
+ */
+function formatDate(date, formatString = 'MMM D, YYYY') {
+    return moment(date).format(formatString);
+}
+
+/**
  * @namespace DateUtils
  */
 const DateUtils = {
     datetimeToRelative,
     datetimeToCalendarTime,
+    datetimeToLocalString,
     startCurrentDateUpdater,
     getLocalMomentFromDatetime,
     getCurrentTimezone,
@@ -220,6 +248,7 @@ const DateUtils = {
     getDBTime,
     subtractMillisecondsFromDateTime,
     getDateStringFromISOTimestamp,
+    formatDate,
 };
 
 export default DateUtils;

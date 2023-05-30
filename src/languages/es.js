@@ -89,9 +89,9 @@ export default {
         noResultsFound: 'No se han encontrado resultados',
         timePrefix: 'Son las',
         conjunctionFor: 'para',
-        todayAt: 'Hoy a las',
-        tomorrowAt: 'Mañana a las',
-        yesterdayAt: 'Ayer a las',
+        today: 'Hoy',
+        tomorrow: 'Mañana',
+        yesterday: 'Ayer',
         conjunctionAt: 'a',
         genericErrorMessage: 'Ups... algo no ha ido bien y la acción no se ha podido completar. Por favor, inténtalo más tarde.',
         error: {
