@@ -65,6 +65,7 @@ import ReportActionItemBasicMessage from './ReportActionItemBasicMessage';
 import * as store from '../../../libs/actions/ReimbursementAccount/store';
 import * as BankAccounts from '../../../libs/actions/BankAccounts';
 import FloatingDateIndicator from "./FloatingDateIndicator";
+import ReportDateIndicator from './ReportDateIndicator';
 
 const propTypes = {
     ...windowDimensionsPropTypes,
@@ -518,9 +519,7 @@ function ReportActionItem(props) {
             withoutFocusOnSecondaryInteraction
             accessibilityLabel={props.translate('accessibilityHints.chatMessage')}
         >
-            {props.showDateIndicator && (
-                <FloatingDateIndicator created={props.action.created} />
-            )}
+            {props.showDateIndicator && <ReportDateIndicator created={props.action.created} />}
             <Hoverable disabled={Boolean(props.draftMessage)}>
                 {(hovered) => (
                     <View>

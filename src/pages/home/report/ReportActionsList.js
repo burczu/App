@@ -124,7 +124,7 @@ function ReportActionsList(props) {
 
     useEffect(() => {
         if (visibleItemIndex === -1 || visibleItemIndex === sortedReportActions.length - 1) {
-            setDateIndicatorLabel('')
+            setDateIndicatorLabel('');
         }
         setDateIndicatorLabel(sortedReportActions[visibleItemIndex]);
     }, [sortedReportActions, visibleItemIndex]);
@@ -133,18 +133,21 @@ function ReportActionsList(props) {
      * Determines whether we should display the date indicator label in chat messages
      * @return {Boolean}
      */
-    const shouldDisplaySectionHeader = useCallback((index) => {
-        if (index === sortedReportActions.length - 1) {
-            return true;
-        }
+    const shouldShowStaticDateIndicator = useCallback(
+        (index) => {
+            if (index === sortedReportActions.length - 1) {
+                return true;
+            }
 
-        const currentItem = sortedReportActions[index];
-        const nextItem = sortedReportActions[index + 1];
+            const currentItem = sortedReportActions[index];
+            const nextItem = sortedReportActions[index + 1];
 
-        if (nextItem) {
-            return DateUtils.formatDate(currentItem.created) !== DateUtils.formatDate(nextItem.created);
-        }
-    }, [sortedReportActions]);
+            if (nextItem) {
+                return DateUtils.formatDate(currentItem.created) !== DateUtils.formatDate(nextItem.created);
+            }
+        },
+        [sortedReportActions],
+    );
 
     const onViewableItemsChanged = useCallback(({viewableItems}) => {
         if (viewableItems.length <= 0) {
@@ -195,11 +198,11 @@ function ReportActionsList(props) {
                     hasOutstandingIOU={hasOutstandingIOU}
                     index={index}
                     isOnlyReportAction={sortedReportActions.length === 1}
-                    showDateIndicator={shouldDisplaySectionHeader(index)}
+                    showDateIndicator={shouldShowStaticDateIndicator(index)}
                 />
             );
         },
-        [newMarkerReportActionID, report, sortedReportActions, mostRecentIOUReportActionID, hasOutstandingIOU, shouldDisplaySectionHeader],
+        [newMarkerReportActionID, report, sortedReportActions, mostRecentIOUReportActionID, hasOutstandingIOU, shouldShowStaticDateIndicator],
     );
 
     // Native mobile does not render updates flatlist the changes even though component did update called.
@@ -215,7 +218,7 @@ function ReportActionsList(props) {
     return (
         <Animated.View style={[animatedStyles, styles.flex1]}>
             {dateIndicatorLabel ? (
-                <FloatingDateIndicator
+                <ReportDateIndicator
                     created={dateIndicatorLabel.created}
                     style={[styles.pAbsolute, styles.t0, styles.l0, styles.r0, styles.pt1, styles.chatItemDateIndicatorWrapper]}
                 />

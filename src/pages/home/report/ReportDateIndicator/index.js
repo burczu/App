@@ -9,10 +9,7 @@ import {withCurrentDate} from '../../../../components/OnyxProvider';
 
 const propTypes = {
     created: PropTypes.string.isRequired,
-    style: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.object),
-        PropTypes.object,
-    ]),
+    style: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
     ...withLocalizePropTypes,
 };
 
@@ -20,7 +17,7 @@ const defaultProps = {
     style: {},
 };
 
-const FloatingDateIndicator = props => (
+const FloatingDateIndicator = (props) => (
     <View style={[styles.justifyContentCenter, styles.alignItemsCenter, props.style]}>
         <View style={[styles.pv2, styles.ph6, styles.border, styles.chatItemDateIndicator]}>
             <Text style={[styles.textLabelSupporting, styles.lh16]}>{props.datetimeToCalendarTime(props.created)}</Text>
@@ -29,11 +26,7 @@ const FloatingDateIndicator = props => (
 );
 
 FloatingDateIndicator.propTypes = propTypes;
-FloatingDateIndicator.displayName = 'FloatingDateIndicator';
+FloatingDateIndicator.displayName = 'ReportDateIndicator';
 FloatingDateIndicator.defaultProps = defaultProps;
 
-export default compose(
-    withLocalize,
-    withCurrentDate(),
-    memo,
-)(FloatingDateIndicator);
+export default compose(withLocalize, withCurrentDate(), memo)(FloatingDateIndicator);
