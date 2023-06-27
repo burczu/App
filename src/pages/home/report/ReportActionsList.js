@@ -22,9 +22,8 @@ import reportPropTypes from '../../reportPropTypes';
 import networkPropTypes from '../../../components/networkPropTypes';
 import withLocalize from '../../../components/withLocalize';
 import useReportScrollManager from '../../../hooks/useReportScrollManager';
-import FloatingDateIndicator from "./FloatingDateIndicator";
+import ReportDateIndicator from "./ReportDateIndicator";
 import DateUtils from "../../../libs/DateUtils";
-import {set} from 'lodash';
 
 const propTypes = {
     /** Position of the "New" line marker */
