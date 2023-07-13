@@ -116,7 +116,7 @@ class BaseInvertedFlatList extends Component {
      * @param {Object} params.item
      * @param {Number} params.index
      *
-     * @return {React.Component}
+     * @return {JSX.Element}
      */
     renderItem({item, index}) {
         if (this.props.shouldMeasureItems) {

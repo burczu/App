@@ -149,6 +149,8 @@ function ReportActionsList(props) {
     );
 
     const onViewableItemsChanged = useCallback(({viewableItems}) => {
+        console.log('viewable items', _.map(viewableItems, (item) => `${item.index} - ${item.item.created} - ${item.item.message[0].text}`));
+
         if (viewableItems.length <= 0) {
             return null;
         }
@@ -260,7 +262,7 @@ function ReportActionsList(props) {
                 onScroll={props.onScroll}
                 onViewableItemsChanged={onViewableItemsChanged}
                 viewabilityConfig={{
-                    itemVisiblePercentThreshold: 15,
+                    itemVisiblePercentThreshold: 100,
                 }}
                 extraData={extraData}
             />
