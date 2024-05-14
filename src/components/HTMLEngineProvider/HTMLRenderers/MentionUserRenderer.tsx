@@ -56,12 +56,17 @@ function MentionUserRenderer({style, tnode, TDefaultRenderer, currentUserPersona
         return displayText.split('@')[0];
     };
 
+    let user;
     if (!isEmpty(htmlAttribAccountID)) {
-        const user = personalDetails[htmlAttribAccountID];
+        user = personalDetails[htmlAttribAccountID];
         accountID = parseInt(htmlAttribAccountID, 10);
         mentionDisplayText = LocalePhoneNumber.formatPhoneNumber(user?.login ?? '') || PersonalDetailsUtils.getDisplayNameOrDefault(user);
         mentionDisplayText = getShortMentionIfFound(mentionDisplayText, htmlAttributeAccountID, user?.login ?? '');
         navigationRoute = ROUTES.PROFILE.getRoute(htmlAttribAccountID);
+
+        if (user?.displayName) {
+            mentionDisplayText = user?.displayName ?? '';
+        }
     } else if ('data' in tnodeClone && !isEmptyObject(tnodeClone.data)) {
         // We need to remove the LTR unicode and leading @ from data as it is not part of the login
         mentionDisplayText = tnodeClone.data.replace(CONST.UNICODE.LTR, '').slice(1);
@@ -69,17 +74,25 @@ function MentionUserRenderer({style, tnode, TDefaultRenderer, currentUserPersona
         asMutable(tnodeClone).data = tnodeClone.data.replace(mentionDisplayText, Str.removeSMSDomain(getShortMentionIfFound(mentionDisplayText, htmlAttributeAccountID)));
 
         accountID = PersonalDetailsUtils.getAccountIDsByLogins([mentionDisplayText])?.[0];
+        user = personalDetails[accountID];
         navigationRoute = ROUTES.DETAILS.getRoute(mentionDisplayText);
         mentionDisplayText = Str.removeSMSDomain(mentionDisplayText);
+
     } else {
         // If neither an account ID or email is provided, don't render anything
         return null;
+    }
+
+    if (user && user?.displayName) {
+        mentionDisplayText = user?.displayName ?? '';
     }
 
     const isOurMention = accountID === currentUserPersonalDetails.accountID;
 
     const flattenStyle = StyleSheet.flatten(style as TextStyle);
     const {color, ...styleWithoutColor} = flattenStyle;
+
+    const inputText = `@${mentionDisplayText}`; // htmlAttribAccountID ? `@${mentionDisplayText}` : <TNodeChildrenRenderer tnode={tnodeClone} />;
 
     return (
         <ShowContextMenuContext.Consumer>
@@ -108,7 +121,7 @@ function MentionUserRenderer({style, tnode, TDefaultRenderer, currentUserPersona
                             testID="span"
                             href={`/${navigationRoute}`}
                         >
-                            {htmlAttribAccountID ? `@${mentionDisplayText}` : <TNodeChildrenRenderer tnode={tnodeClone} />}
+                            {inputText}
                         </Text>
                     </UserDetailsTooltip>
                 </Text>
